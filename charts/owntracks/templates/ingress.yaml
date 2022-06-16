@@ -1,0 +1,47 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
+  name: "{{ $fullname }}"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    name: "{{ $fullname }}"
+  annotations:
+    {{- if .Values.ingress.nginx }}
+    kubernetes.io/ingress.class: "nginx"  
+    {{- end }}
+{{ .Values.ingress.annotations | toYaml | indent 4 }}
+spec:
+  rules:
+  - host: {{ .Values.externalDomain }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/api/"
+        backend:
+          service:
+            name: "{{ $fullname }}"
+            port: 
+              number: {{ .Values.owntracks.service.externalPort | default .Values.owntracks.service.port }}
+      - pathType: Prefix
+        path: "/ws/"
+        backend:
+          service:
+            name: "{{ $fullname }}"
+            port:
+              number: {{ .Values.owntracks.service.externalPort | default .Values.owntracks.service.port }}
+      - pathType: Prefix
+        path: "/"
+        backend:
+        {{- if .Values.frontend.enabled }}
+          service:
+            name: "{{ $fullname }}-frontend"
+            port:
+              number: {{ .Values.frontend.service.externalPort | default .Values.frontend.service.port }}
+        {{- else }}
+          service:
+            name: "{{ $fullname }}"
+            port:
+              number: {{ .Values.owntracks.service.externalPort | default .Values.owntracks.service.port }}
+        {{- end }}
+{{- end }}

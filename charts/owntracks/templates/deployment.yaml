@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
+  name: {{ $fullname }}
+  namespace: "{{ .Release.Namespace | default "default" }}"
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  selector:
+    matchLabels:
+      app: {{ $fullname }}
+  replicas: {{ .Values.owntracks.replicaCount | default 1 | int }}
+  template:
+    metadata:
+      labels:
+        app: {{ $fullname }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.owntracks.image.name }}:{{ .Values.owntracks.image.version }}"
+        imagePullPolicy: "{{ .Values.owntracks.image.pullpolicy }}"
+        env:
+        - name: OTR_STORAGEDIR
+          value: /data
+        - name: OTR_HTTPHOST
+          value: localhost
+        - name: OTR_HTTPPORT
+          value: "{{ .Values.owntracks.service.port | default "8083" }}"
+        - name: OTR_LMDBSIZE
+          value: "{{ .Values.owntracks.lmdb.size | default 10 | mul 1048576 }}"
+        {{- if .Values.mqtt.enabled -}}
+        {{ with .Values.mqtt }}
+        - name: OTR_HOST
+          value: {{ .host }}
+        - name: OTR_PORT
+          value: {{ .port | default 1883 }}
+        - name: OTR_TOPICS
+          value: "{{ .topics | join " " }}"
+        {{- if .userSecret -}}
+        - name: OTR_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .userSecret }}
+              key: user
+        - name: OTR_PASS
+          valueFrom:
+            secretKeyRef:
+              name: {{ .userSecret }}
+              key: password
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.owntracks.service.port | int }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.owntracks.service.port | int }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.owntracks.service.port | int }}
+        resources:
+{{ toYaml .Values.owntracks.resources | indent 10 }}

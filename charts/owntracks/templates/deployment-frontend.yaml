@@ -1,0 +1,42 @@
+{{- if .Values.frontend.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
+  name: "{{ $fullname }}-frontend"
+  namespace: "{{ .Release.Namespace | default "default" }}"
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  selector:
+    matchLabels:
+      app: "{{ $fullname }}-frontend"
+  replicas: {{ .Values.frontend.replicaCount | default 1 | int }}
+  template:
+    metadata:
+      labels:
+        app: "{{ $fullname }}-frontend"
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.frontend.image.name }}:{{ .Values.frontend.image.version }}"
+        imagePullPolicy: "{{ .Values.frontend.image.pullpolicy }}"
+        env:
+        - name: LISTEN_PORT
+          value: "{{ .Values.frontend.service.port }}"
+        - name: SERVER_HOST
+          value: "{{ $fullname }}.{{ .Release.Namespace | default "default" }}.svc.{{ .Values.clusterDomain }}"
+        - name: SERVER_PORT
+          value: "{{ .Values.owntracks.service.port }}"
+        ports:
+        - containerPort: {{ .Values.frontend.service.port | int }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.frontend.service.port | int }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.frontend.service.port | int }}
+        resources:
+{{ toYaml .Values.frontend.resources | indent 10 }}
+{{- end -}}
