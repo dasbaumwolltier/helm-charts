@@ -54,3 +54,5 @@ config:
     existingSecret: ""
 
 resources: {}
+
+# additionalPodLabels:
