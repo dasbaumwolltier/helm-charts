@@ -1,3 +1,7 @@
+# You can chose to run this as a Deployment
+# or a StatefulSet
+kind: StatefulSet
+
 image:
   name: eclipse-mosquitto
   version: 2.0.14-openssl
@@ -28,10 +32,14 @@ config:
     allowAnonymous: false
 
     users: {}
+
+    # The secret has to contain a key "pwfile"
     usersSecret: ""
 
   persistence:
     enabled: false
+
+    existingClaim: ""
 
     pvc:
       enabled: false
@@ -44,3 +52,5 @@ config:
     keyfile: ""
 
     existingSecret: ""
+
+resources: {}

@@ -1,0 +1,18 @@
+{{- if and (and .Values.config.persistence.enabled .Values.config.persistence.pvc.enabled) (not .Values.config.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
+  name: "{{ $fullname }}-data"
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  resources:
+    requests:
+      storage: {{ .Values.config.persistence.pvc.size }}
+  volumeMode: Filesystem
+  {{- if .Values.config.persistence.pvc.storageClass }}
+  storageClassName: {{ .Values.config.persistence.pvc.storageClass }}
+  {{- end }}
+  accessModes:
+  - ReadWriteOnce
+
+{{- end }}

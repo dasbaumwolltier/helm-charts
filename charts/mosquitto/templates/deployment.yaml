@@ -1,11 +1,14 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: {{ .Values.kind }}
 metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
   name: "{{ $fullname }}"
   namespace: "{{ .Release.Namespace }}"
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
+  {{- if eq .Values.kind "StatefulSet" }}
+  serviceName: "{{ $fullname }}"
+  {{- end }}
   selector:
     matchLabels:
       app: "{{ $fullname }}"
@@ -19,16 +22,87 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.name }}:{{ .Values.image.version }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy | default "IfNotPresent" }}"
+        args:
+        - "/usr/sbin/mosquitto"
+        - "-c"
+        - "/mqtt/config/custom.conf"
+        volumeMounts:
+        - name: config
+          mountPath: /mqtt/config
+          readOnly: true
+        {{- if not .Values.config.authentication.usersSecret }}
+        - name: secret
+          mountPath: /mqtt/secret
+          readOnly: true
+        {{- else }}
+        - name: pwfile
+          mountPath: /mqtt/secret
+          readOnly: true
+        {{- end }}
+        {{- if .Values.config.enableSecure }}
+        {{- if not .Values.config.tls.existingSecret }}
+        - name: tls
+          mountPath: /mqtt/tls
+          readOnly: true
+        {{- else if .Values.config.enableSecure }}
+        - name: existing-tls-secret
+          mountPath: /mqtt/tls
+          readOnly: true
+        {{- end }}
+        {{- end }}
+        {{- if .Values.config.persistence.enabled }}
+        - name: data
+          mountPath: /data
+        {{- end }}
         ports:
-        - containerPort: {{ .Values.service.port | int }}
-        - containerPort: {{ .Values.service.securePort | int }}
-        livenessProbe:
-          httpGet:
-            path: /
-            port: {{ .Values.service.port | int }}
+        - name: mqtt 
+          protocol: TCP
+          containerPort: {{ .Values.service.port | int }}
+        - name: mqtts
+          protocol: TCP
+          containerPort: {{ .Values.service.securePort | int }}
         readinessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
+            {{- if .Values.config.enableSecure }}
+            port: {{ .Values.service.securePort | int }}
+            {{- else }}
             port: {{ .Values.service.port | int }}
+            {{- end }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+{{ .Values.resources | toYaml | indent 10 }}
+      volumes:
+      - name: config
+        configMap:
+          name: "{{ $fullname }}-config"
+      {{- if not .Values.config.authentication.usersSecret }}
+      - name: secret
+        secret:
+          secretName: "{{ $fullname }}-secret"
+      {{- end }}
+      {{- if .Values.config.authentication.usersSecret }}
+      - name: pwfile
+        secret:
+          secretName: {{ .Values.config.authentication.usersSecret }}
+          items:
+            - pwfile
+      {{- end }}
+      {{- if .Values.config.enableSecure }}
+      {{- if not .Values.config.tls.existingSecret }}
+      - name: tls
+        secret:
+          secretName: "{{ $fullname }}-tls-secret"
+      {{- else }}
+      - name: existing-tls-secret
+        secret:
+          secretName: "{{ .Values.config.tls.existingSecret }}"
+      {{- end }}
+      {{- end }}
+      {{- if .Values.config.persistence.enabled }}
+      - name: data
+        persistentVolumeClaim:
+          {{- if .Values.config.persistence.existingClaim }}
+            claimName: {{ .Values.config.persistence.existingClaim }}
+          {{- else if .Values.config.persistence.pvc.enabled }}
+            claimName: "{{ $fullname }}-data"
+          {{- end }}
+      {{- end }}

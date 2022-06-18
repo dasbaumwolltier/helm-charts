@@ -4,12 +4,6 @@ metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | 
   name: "{{ $fullname }}-config"
   namespace: {{ .Release.Namespace }}
 data:
-  {{- if not .Values.config.authentication.usersSecret }}
-  pwfile: |
-    {{- range $key, $value := .Values.config.authentication.users }}
-    {{ $key }}:{{ $value }}
-    {{- end }}
-  {{- end }}
   acl.conf: |
     # Comment for first line
 
@@ -33,33 +27,33 @@ data:
     allow_anonymous {{ .Values.config.authentication.allowAnonymous }}
 
     {{- if .Values.config.authentication.enabled }}
-    password_file /mqtt/pwfile
+    password_file /mqtt/secret/pwfile
     {{- end }}
 
     {{- if .Values.config.acl.enabled }}
-    acl_file /mqtt/acl.conf
+    acl_file /mqtt/config/acl.conf
     {{- end }}
 
-    {{- if .Values.enableInsecure }}
+    {{- if .Values.config.enableInsecure }}
 
     listener {{ .Values.service.port }} 0.0.0.0
 
     {{- end }}
-    {{- if .Values.enableSecure }}
+    {{- if .Values.config.enableSecure }}
 
     listener {{ .Values.service.securePort }} 0.0.0.0
 
-    cafile /mqtt/tls.crt
-    certfile /mqtt/tls.crt
-    keyfile /mqtt/tls.key
+    cafile /mqtt/tls/tls.crt
+    certfile /mqtt/tls/tls.crt
+    keyfile /mqtt/tls/tls.key
 
     {{- if .Values.config.tls.existingSecret }}
 
-    cafile /mqtt/tls.crt
+    cafile /mqtt/tls/tls.crt
 
     {{- else }}
 
-    cafile /mqtt/ca.crt
+    cafile /mqtt/tls/ca.crt
     
     {{- end }}
 
