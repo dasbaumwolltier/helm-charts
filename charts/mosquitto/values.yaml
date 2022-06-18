@@ -1,0 +1,46 @@
+image:
+  name: eclipse-mosquitto
+  version: 2.0.14-openssl
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+
+  port: 1883
+  securePort: 8883
+
+  externalPort: ""
+  externalSecurePort: ""
+
+config:
+  enableInsecure: false
+  enableSecure: true
+
+  acl:
+    anonymous:
+    - matchType: pattern
+      accessType: deny
+      value: "+"
+    users: {}
+
+  authentication:
+    enabled: true
+    allowAnonymous: false
+
+    users: {}
+    usersSecret: ""
+
+  persistence:
+    enabled: false
+
+    pvc:
+      enabled: false
+      storageClass: ""
+      size: 1Gi
+
+  tls:
+    cafile: ""
+    certfile: ""
+    keyfile: ""
+
+    existingSecret: ""

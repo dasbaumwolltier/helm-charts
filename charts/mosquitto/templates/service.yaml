@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
+  name: "{{ $fullname }}"
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  {{- if .Values.config.enableInsecure }}
+  - port: {{ .Values.service.externalPort | default .Values.service.port | int }}
+    targetPort: {{ .Values.service.port | int }}
+    protocol: TCP
+    name: mqtt
+  {{- end }}
+  {{- if .Values.config.enableSecure }}
+  - port: {{ .Values.service.externalSecurePort | default .Values.service.securePort | int }}
+    targetPort: {{ .Values.service.securePort | int }}
+    protocol: TCP
+    name: mqtts
+  {{- end }}
+  selector:
+    app: "{{ $fullname }}"

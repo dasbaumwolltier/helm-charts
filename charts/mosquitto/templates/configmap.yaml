@@ -1,0 +1,66 @@
+kind: ConfigMap
+apiVersion: v1
+metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
+  name: "{{ $fullname }}-config"
+  namespace: {{ .Release.Namespace }}
+data:
+  {{- if not .Values.config.authentication.usersSecret }}
+  pwfile: |
+    {{- range $key, $value := .Values.config.authentication.users }}
+    {{ $key }}:{{ $value }}
+    {{- end }}
+  {{- end }}
+  acl.conf: |
+    # Comment for first line
+
+    {{- range .Values.config.acl.anonymous }}
+    {{ .matchType }} {{ .accessType }} {{ .value }}
+    {{- end }}
+
+    {{- range $key, $value := .Values.config.acl.users }}
+    user {{ $key }}
+
+    {{- range $value }}
+    {{ .matchType }} {{ .accessType }} {{ .value }}
+    {{- end }}
+
+    {{- end }}
+  custom.conf: |
+    persistence {{ .Values.config.persistence.enabled }}
+    persistence_location /data
+    persistence_file mosquitto.db
+
+    allow_anonymous {{ .Values.config.authentication.allowAnonymous }}
+
+    {{- if .Values.config.authentication.enabled }}
+    password_file /mqtt/pwfile
+    {{- end }}
+
+    {{- if .Values.config.acl.enabled }}
+    acl_file /mqtt/acl.conf
+    {{- end }}
+
+    {{- if .Values.enableInsecure }}
+
+    listener {{ .Values.service.port }} 0.0.0.0
+
+    {{- end }}
+    {{- if .Values.enableSecure }}
+
+    listener {{ .Values.service.securePort }} 0.0.0.0
+
+    cafile /mqtt/tls.crt
+    certfile /mqtt/tls.crt
+    keyfile /mqtt/tls.key
+
+    {{- if .Values.config.tls.existingSecret }}
+
+    cafile /mqtt/tls.crt
+
+    {{- else }}
+
+    cafile /mqtt/ca.crt
+    
+    {{- end }}
+
+    {{- end }}
