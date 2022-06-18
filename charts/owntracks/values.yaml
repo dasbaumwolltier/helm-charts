@@ -1,4 +1,4 @@
-# Example: owntracks.example.com
+# Example: owntracks.example.com 
 externalDomain: ""
 clusterDomain: "cluster.local"
 
