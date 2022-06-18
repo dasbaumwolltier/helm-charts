@@ -101,6 +101,8 @@ mqtt:
 
   topics: []
 
+# additionalPodLabels:
+
 # Values can be found here 
 mosquitto:
   enabled: false
@@ -161,4 +163,6 @@ mosquitto:
       existingSecret: ""
 
   resources: {}
+
+  # additionalPodLabels:
 
