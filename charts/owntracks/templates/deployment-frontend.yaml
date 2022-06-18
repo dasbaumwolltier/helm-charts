@@ -20,6 +20,9 @@ spec:
     metadata:
       labels:
         app: "{{ $fullname }}-frontend"
+        {{- if .Values.additionalPodLabels }}
+        {{ .Values.additionalPodLabels | toYaml }}
+        {{- end }}
     spec:
       containers:
       - name: {{ .Chart.Name }}

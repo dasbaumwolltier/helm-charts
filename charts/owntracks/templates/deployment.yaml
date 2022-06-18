@@ -5,9 +5,6 @@ metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | 
   namespace: "{{ .Release.Namespace | default "default" }}"
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-    {{- if .Values.additionalPodLabels }}
-    {{ .Values.additionalPodLabels | toYaml }}
-    {{- end }}
 spec:
   strategy:
     type: "{{ .Values.owntracks.updateStrategy }}"
@@ -19,6 +16,9 @@ spec:
     metadata:
       labels:
         app: {{ $fullname }}
+        {{- if .Values.additionalPodLabels }}
+        {{ .Values.additionalPodLabels | toYaml }}
+        {{- end }}
     spec:
       containers:
       - name: {{ .Chart.Name }}

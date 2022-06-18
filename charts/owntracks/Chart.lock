@@ -1,6 +1,6 @@
 dependencies:
 - name: mosquitto
   repository: https://dasbaumwolltier.github.io/helm-charts/
-  version: 0.0.3
-digest: sha256:cdb9784193662ae4fe5ab500ec3953999855a6587e58e3b776317f86598fc24b
-generated: "2022-06-18T14:43:06.745572+02:00"
+  version: 0.0.7
+digest: sha256:66236f32d20a8e8c7ffc41cdcbf4bbeb23a7dee40720e62491359a244c8fd86a
+generated: "2022-06-18T14:56:49.931625+02:00"
