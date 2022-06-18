@@ -3,6 +3,16 @@ entries:
   mosquitto:
   - apiVersion: v2
     appVersion: 2.0.14
+    created: "2022-06-18T12:40:51.475349135Z"
+    digest: f3a71525744de861e16022780144a6a65d4fab02c57e17d7d031e3b9d33e6aa2
+    home: https://github.com/dasbaumwolltier/helm-charts
+    name: mosquitto
+    type: application
+    urls:
+    - https://github.com/dasbaumwolltier/helm-charts/releases/download/mosquitto-0.0.3/mosquitto-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
+    appVersion: 2.0.14
     created: "2022-06-18T12:11:42.325183823Z"
     digest: 8cf45c2b2e76af9fa1e68102e24d9e2b0ccb244c3f7d8a48105fe0fd78b1081c
     home: https://github.com/dasbaumwolltier/helm-charts
@@ -73,4 +83,4 @@ entries:
     urls:
     - https://github.com/dasbaumwolltier/helm-charts/releases/download/owntracks-0.0.1/owntracks-0.0.1.tgz
     version: 0.0.1
-generated: "2022-06-18T12:27:54.078564334Z"
+generated: "2022-06-18T12:40:51.475514536Z"
