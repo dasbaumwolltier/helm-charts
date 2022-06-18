@@ -30,7 +30,7 @@ spec:
           value: "{{ .Values.owntracks.service.port | default "8083" }}"
         - name: OTR_LMDBSIZE
           value: "{{ .Values.owntracks.lmdb.size | default 10 | mul 1048576 }}"
-        {{- if .Values.mqtt.enabled -}}
+        {{- if .Values.mqtt.enabled }}
         {{ with .Values.mqtt }}
         - name: OTR_HOST
           value: "{{ .host }}"
@@ -38,7 +38,7 @@ spec:
           value: "{{ .port | default 1883 }}"
         - name: OTR_TOPICS
           value: "{{ .topics | join " " }}"
-        {{- if .userSecret -}}
+        {{- if .userSecret }}
         - name: OTR_USER
           valueFrom:
             secretKeyRef:
