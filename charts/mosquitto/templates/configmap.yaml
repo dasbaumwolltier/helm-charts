@@ -43,7 +43,6 @@ data:
 
     listener {{ .Values.service.securePort }} 0.0.0.0
 
-    cafile /mqtt/tls/tls.crt
     certfile /mqtt/tls/tls.crt
     keyfile /mqtt/tls/tls.key
 
