@@ -9,6 +9,8 @@ spec:
   {{- if eq .Values.kind "StatefulSet" }}
   serviceName: "{{ $fullname }}"
   {{- end }}
+  strategy:
+    type: "{{ .Values.updateStrategy }}"
   selector:
     matchLabels:
       app: "{{ $fullname }}"

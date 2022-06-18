@@ -2,6 +2,8 @@
 # or a StatefulSet
 kind: StatefulSet
 
+updateStrategy: Recreate
+
 image:
   name: eclipse-mosquitto
   version: 2.0.14-openssl
