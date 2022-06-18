@@ -13,6 +13,6 @@ spec:
   storageClassName: {{ .Values.config.persistence.pvc.storageClass }}
   {{- end }}
   accessModes:
-  - ReadWriteOnce
+  - {{ .Values.config.persistence.pvc.accessMode }}
 
 {{- end }}

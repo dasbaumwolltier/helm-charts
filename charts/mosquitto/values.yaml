@@ -47,6 +47,7 @@ config:
       enabled: false
       storageClass: ""
       size: 1Gi
+      accessMode: ReadWriteOnce
 
   tls:
     cafile: ""
