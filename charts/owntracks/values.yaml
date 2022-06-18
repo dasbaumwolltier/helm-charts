@@ -84,6 +84,9 @@ ingress:
     enabled: false
     issuer: letsencrypt
 
+    # Uses the externalDomain per default
+    host: ""
+
   annotations: {}
 
 mqtt:

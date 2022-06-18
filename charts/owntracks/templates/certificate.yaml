@@ -3,10 +3,10 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ .Values.externalDomain }}
-  namespace: prometheus
+  namespace: {{ .Release.Namespace }}
 spec:
   dnsNames:
-    - {{ .Values.externalDomain }}
+    - "{{ .Values.ingress.certificate.host | default .Values.externalDomain }}"
   secretName: {{ .Values.externalDomain }}
   issuerRef:
     name: {{ .Values.ingress.certificate.issuer }}
