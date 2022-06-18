@@ -1,0 +1,14 @@
+{{- if .Values.ingress.certificate.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Values.externalDomain }}
+  namespace: prometheus
+spec:
+  dnsNames:
+    - {{ .Values.externalDomain }}
+  secretName: {{ .Values.externalDomain }}
+  issuerRef:
+    name: {{ .Values.ingress.certificate.issuer }}
+    kind: ClusterIssuer
+{{- end }}

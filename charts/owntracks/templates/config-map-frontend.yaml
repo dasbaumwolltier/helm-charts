@@ -1,0 +1,12 @@
+kind: ConfigMap
+apiVersion: v1
+metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
+  name: "{{ $fullname }}-config-frontend"
+  namespace: {{ .Release.Namespace }}
+data:
+  config.js: |
+    window.owntracks = window.owntracks || {};
+    window.owntracks.config = {
+      {{ .Values.frontend.config | toJson | trimSuffix "}" | trimPrefix "{" }},
+      {{ .Values.frontend.jsConfig | indent 6 }}  
+    };

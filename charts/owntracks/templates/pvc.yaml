@@ -1,0 +1,21 @@
+{{- if and .Values.owntracks.persistence.enabled (not .Values.owntracks.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
+  name: "{{ $fullname }}-data"
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  resources:
+    requests:
+      storage: {{ .Values.owntracks.persistence.size }}
+  volumeMode: Filesystem
+  {{- if .Values.owntracks.persistence.storageClass }}
+  storageClassName: {{ .Values.owntracks.persistence.storageClass }}
+  {{- end }}
+  accessModes:
+  {{- if eq (.Values.owntracks.replicaCount | int) 1 }}
+  - ReadWriteOnce
+  {{- else }}
+  - ReadWriteMany
+  {{- end }}
+{{- end }}

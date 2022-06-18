@@ -1,0 +1,161 @@
+# Example: owntracks.example.com
+externalDomain: ""
+clusterDomain: "cluster.local"
+
+owntracks:
+  image:
+    name: owntracks/recorder
+    version: 0.8.6-12
+    pullpolicy: IfNotPresent
+
+  replicaCount: 1
+  updateStrategy: Recreate
+
+  service:
+    enabled: true
+
+    port: 8083
+    type: ClusterIP
+    externalPort: ""
+
+  persistence:
+    enabled: false
+    storageClass: ""
+    size: 1Gi
+    existingClaim: ""
+
+  lmdb:
+    # The size of the database in MiB
+    size: 10
+
+  resources: {}
+
+frontend:
+  enabled: true
+
+  image:
+    name: owntracks/frontend
+    version: 2.11.0
+    pullpolicy: IfNotPresent
+
+  replicaCount: 1
+  updateStrategy: RollingUpdate
+  
+  service:
+    enabled: true
+
+    port: 8080
+    type: ClusterIP
+    externalPort: ""
+
+  # For more options consult https://github.com/owntracks/frontend/blob/main/docs/config.md
+  config:
+    api:
+      # The external base URL. For example https://owntracks.example.com
+      baseUrl: ""
+
+    verbose: false
+
+  jsConfig: |
+    endDateTime: (() => {
+      const endDateTime = new Date();
+      endDateTime.setHours(23, 59, 59, 0);
+      return endDateTime;
+    })(),
+
+    // Data will be fetched from the first day of the current month
+    startDateTime: (() => {
+      const startDateTime = new Date();
+      startDateTime.setHours(0, 0, 0, 0);
+      startDateTime.setDate(1);
+      return startDateTime;
+    })(),
+
+  replicaCount: 1
+
+  resources: {}
+
+ingress:
+  enabled: false
+
+  tlsSecret: ""
+  
+  certificate:
+    enabled: false
+    issuer: letsencrypt
+
+  annotations: {}
+
+mqtt:
+  enabled: false
+
+  host: ""
+  port: 1883
+  user: ""
+  password: ""
+
+  userSecret: ""
+
+  topics: []
+
+# Values can be found here 
+mosquitto:
+  enabled: false
+  
+  # You can chose to run this as a Deployment
+  # or a StatefulSet
+  kind: StatefulSet
+
+  image:
+    name: eclipse-mosquitto
+    version: 2.0.14-openssl
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+
+    port: 1883
+    securePort: 8883
+
+    externalPort: ""
+    externalSecurePort: ""
+
+  config:
+    enableInsecure: false
+    enableSecure: true
+
+    acl:
+      anonymous:
+      - matchType: pattern
+        accessType: deny
+        value: "+"
+      users: {}
+
+    authentication:
+      enabled: true
+      allowAnonymous: false
+
+      users: {}
+
+      # The secret has to contain a key "pwfile"
+      usersSecret: ""
+
+    persistence:
+      enabled: false
+
+      existingClaim: ""
+
+      pvc:
+        enabled: false
+        storageClass: ""
+        size: 1Gi
+
+    tls:
+      cafile: ""
+      certfile: ""
+      keyfile: ""
+
+      existingSecret: ""
+
+  resources: {}
+

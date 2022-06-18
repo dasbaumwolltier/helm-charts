@@ -1,0 +1,15 @@
+apiVersion: v2
+name: owntracks
+appVersion: 0.8.6-12
+version: 0.0.1
+type: application
+home: https://github.com/dasbaumwolltier/helm-charts
+
+dependencies:
+  - name: mosquitto
+    repository: https://dasbaumwolltier.github.io/helm-charts/
+    version: 0.0.1
+    condition: mosquitto.enabled
+    import-values:
+      - "mosquitto"
+
