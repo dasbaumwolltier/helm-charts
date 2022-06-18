@@ -13,9 +13,5 @@ spec:
   storageClassName: {{ .Values.owntracks.persistence.storageClass }}
   {{- end }}
   accessModes:
-  {{- if eq (.Values.owntracks.replicaCount | int) 1 }}
-  - ReadWriteOnce
-  {{- else }}
-  - ReadWriteMany
-  {{- end }}
+  - {{ .Values.owntracks.persistence.accessMode }}
 {{- end }}
