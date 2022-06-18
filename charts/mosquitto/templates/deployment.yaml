@@ -8,9 +8,10 @@ metadata: {{ $fullname := printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | 
 spec:
   {{- if eq .Values.kind "StatefulSet" }}
   serviceName: "{{ $fullname }}"
-  {{- end }}
+  {{- else }}
   strategy:
     type: "{{ .Values.updateStrategy }}"
+  {{- end }}
   selector:
     matchLabels:
       app: "{{ $fullname }}"
