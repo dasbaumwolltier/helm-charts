@@ -58,7 +58,7 @@ spec:
         volumeMounts:
         {{- if .Values.owntracks.persistence.enabled }}
         - name: data
-          mountPath: /data
+          mountPath: /store
         {{- end }}
         ports:
         - containerPort: {{ .Values.owntracks.service.port | int }}
