@@ -1,7 +1,7 @@
 apiVersion: v2
 name: owntracks
 appVersion: 0.8.6-12
-version: 0.0.7
+version: 0.0.8
 type: application
 home: https://github.com/dasbaumwolltier/helm-charts
 

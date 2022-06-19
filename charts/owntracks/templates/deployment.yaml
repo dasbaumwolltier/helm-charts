@@ -62,14 +62,10 @@ spec:
         {{- end }}
         ports:
         - containerPort: {{ .Values.owntracks.service.port | int }}
-        livenessProbe:
-          httpGet:
-            path: /
-            port: {{ .Values.owntracks.service.port | int }}
         readinessProbe:
-          httpGet:
-            path: /
-            port: {{ .Values.owntracks.service.port | int }}
+          exec:
+            command:
+              - /usr/sbin/recorder-health.sh
         resources:
 {{ toYaml .Values.owntracks.resources | indent 10 }}
       volumes:
