@@ -84,6 +84,23 @@ entries:
   owntracks:
   - apiVersion: v2
     appVersion: 0.8.6-12
+    created: "2022-06-19T10:26:37.048514802Z"
+    dependencies:
+    - condition: mosquitto.enabled
+      import-values:
+      - mosquitto
+      name: mosquitto
+      repository: https://dasbaumwolltier.github.io/helm-charts/
+      version: 0.0.7
+    digest: 482c2eb0fd254a9c2c48ca300f7448d9525cd7255bc2a54fdb238cf8d465d7d0
+    home: https://github.com/dasbaumwolltier/helm-charts
+    name: owntracks
+    type: application
+    urls:
+    - https://github.com/dasbaumwolltier/helm-charts/releases/download/owntracks-0.0.7/owntracks-0.0.7.tgz
+    version: 0.0.7
+  - apiVersion: v2
+    appVersion: 0.8.6-12
     created: "2022-06-18T12:59:03.36450447Z"
     dependencies:
     - condition: mosquitto.enabled
@@ -184,4 +201,4 @@ entries:
     urls:
     - https://github.com/dasbaumwolltier/helm-charts/releases/download/owntracks-0.0.1/owntracks-0.0.1.tgz
     version: 0.0.1
-generated: "2022-06-18T13:22:02.667162874Z"
+generated: "2022-06-19T10:26:37.048638502Z"
